@@ -22,61 +22,107 @@ OpenRIMS is the next-generation software platform to assist **National Medicines
 ## Implemented Features
 
 ### Application & Registration Management
-- **Application lifecycle management** – Create, submit, track, amend, renew, and de-register medicine/product applications
-- **Activity manager** – Assign, manage, and track activities within a workflow for each application
-- **Inspection management** – Schedule and manage inspection workflows
-- **Amendment workflows** – Support for amending existing approved registrations
-- **Renewal workflows** – Track and process registration renewal applications
-- **De-registration workflows** – Manage the withdrawal of registered products
-- **Public permit data** – Expose approved permit information to public users
+
+OpenRIMS provides a complete end-to-end lifecycle for medicine and product registration. Applicants can start a new registration submission (`ApplicationStart`), select an existing application to continue working on (`ApplicationSelect`), and track its progress through all review stages. The system stores all application data (`ApplicationData`), attached supporting documents (`ApplicationFiles`), and assigned register numbers (`Register`) in a single record. Regulators manage active submissions through the **Activity Manager** (`ActivityManager`), which presents the assigned reviewer with the application's current checklist, data form, history, and available routing actions (submit, return to applicant, reject) on one screen.
+
+- **Full application lifecycle** – New submissions, in-progress tracking, approval, and post-approval management for any product category, all within a configurable workflow.
+- **Configurable checklists** (`CheckList`) – Each workflow activity can carry a Yes/No/N/A checklist that reviewers must complete before routing the application to the next stage. Checklist items are dictionary-driven and fully configurable by administrators.
+- **Amendment management** – Regulators and applicants can open a post-approval amendment workflow (`AmendmentSelect`, `AmendmentAdd`, `AmendmentActivity`) to modify approved registrations without losing the original record.
+- **Renewal management** – Separate renewal workflow (`RenewSelect`) allows re-evaluation of registrations nearing expiry, with automatic link to the original approval.
+- **De-registration** – Formal withdrawal workflow (`DeRegistrationSelect`, `DeregistrationAdd`) that tracks the reason and date of de-registration while preserving the full history.
+- **Inspection management** (`InspectionSelect`) – Standalone inspection workflow that can be triggered independently of product registration, supporting site audits and GMP inspections.
+- **Application event log** (`ApplicationEvents`, `ApplicationEventData`) – Every state transition and user action on an application is recorded and displayed as a chronological event log for full traceability.
+- **Application history & register numbers** – Registration number assignment (`Register`) with configurable validity periods and expiry dates; all previously assigned numbers are browsable from the application record (`ApplicationRegisters`).
+- **Public permit viewer** (`PublicPermitData`, `PermitList`) – Approved registrations can be published to a public-facing, read-only permit list so that citizens and healthcare professionals can verify the registration status of any product without logging in.
+- **Application receipt** (`SubmitReciept`) – A timestamped submission receipt can be generated and downloaded in PDF at the point of submission for the applicant's records.
+
+---
 
 ### Workflow & Process Configuration
-- **Configurable workflows** – Define and customize multi-step approval processes without coding via the Process Configurator
-- **Workflow validation** – Built-in process validator to check workflow integrity
-- **Activity history & timelines** – Full audit trail of all actions taken on an application
-- **To-do lists** – User-facing task queues for pending activities
-- **Scheduler / host schedule** – Background job scheduling for automated tasks
-- **Re-assignment of activities and users** – Reassign tasks across team members
+
+One of OpenRIMS' core strengths is that entire regulatory processes can be defined and modified in the UI without any code changes.
+
+- **Process Configurator** (`ProcessConfigurator`) – Administrators select a process type from a master dictionary, then define or edit the ordered list of workflow stages (activities) using the **Workflow Configurator** (`WorkflowConfigurator`). Each stage specifies the responsible role, the data form to display, checklist items, and available routing actions. Changes take effect immediately for new applications.
+- **Workflow data configurator** (`DataConfigurator`, `DataCollForm`, `DataVarTable`, `DataVarForm`) – For every workflow stage, administrators define the exact data variables (text, date, number, dropdown, file upload, address, etc.) that reviewers or applicants must fill in. Forms are previewed live before publishing (`DataFormPreview`).
+- **Variable assistant** (`VariableAssistant`, `VariableAssistantEdit`) – A guided editor for creating and editing form variables, including validation rules, dictionary bindings, and display order.
+- **Process validator** (`ProcessValidator`) – A built-in consistency checker that validates a workflow definition before activation, flagging missing data forms, circular routes, or unresolved references.
+- **Workflow export/import** (`ImportWorkflow`, `ImportDataConfiguration`) – Completed workflow definitions can be exported to Excel and imported into another OpenRIMS instance, enabling configuration reuse across country deployments.
+- **Scheduler** (`Scheduler`, `HostSchedule`) – Recurring background jobs (e.g. triggering renewal reminders, batch status checks) are attached to specific workflow stages and are configured with start date and recurrence interval directly in the application form.
+- **Activity re-assignment** (`ReassignActivities`) – Supervisors can move all open activities from one employee to another in bulk, for example when a staff member is on leave. The current workload and available capacity are shown side by side.
+- **Applicant user re-assignment** (`ReassignUsers`, `ReassignUsersLog`) – When an applicant changes the email/account under which their submissions were filed, a supervisor can transfer all historical and in-progress submissions to the new account. A log of all re-assignments is retained.
+- **Timeline view** (`TimeLine`) – Each application displays a visual timeline of its workflow history, showing when each stage was entered, completed, and by whom.
+- **To-do list** (`ToDoList`) – Every logged-in user sees a personal task queue of activities currently assigned to them, with direct links into the relevant application.
+
+---
 
 ### Data & Dictionary Configuration
-- **Data configurator** – Dynamically define and customize data structures and form layouts for any application type
-- **Dictionary management** – Hierarchical dictionary/code-list editor with multi-level support
-- **ATC codes** – Manage the WHO Anatomical Therapeutic Chemical classification codes
-- **INN (International Non-proprietary Names)** – Manage INN data for medicines
-- **Excipients** – Manage excipient reference data
+
+- **Dictionary management** (`Dictionaries`, `Dictionary`, `DictLevel`, `DictNode`, `RootNode`) – Hierarchical, multi-level code lists underpin all dropdown fields, workflow routing, and report categories in OpenRIMS. Administrators manage the full tree structure (add, edit, move, deactivate nodes) through a graphical tree editor. Each node stores a URL-based identifier that is used as a stable reference across configurations.
+- **ATC codes** (`ATCCodes`, `Import_ATC`) – Full WHO Anatomical Therapeutic Chemical classification tree is stored and manageable within the system. Codes can be imported in bulk from a standard Excel template.
+- **INN (International Non-proprietary Names)** (`Inns`) – The INN reference list used for drug substance identification is maintained in a searchable, paginated table with add/edit capabilities.
+- **Excipients** (`Excipients`) – Similar to INNs, the excipient reference catalogue supports controlled vocabulary for inactive ingredient declarations.
+- **Data sources configurator** (`DataSources`, `DataSource`, `DataSourceDetails`, `DataSourceTest`) – Administrators can define external SQL data sources and test their queries from inside the UI. These are used to feed lookup tables and reports from warehouse or legacy databases.
+- **Formats** (`Formats`) – Country-specific date and number display formats are configurable per locale, so the same installation can present dates in DD/MM/YYYY for one country and MM/DD/YYYY for another.
+
+---
 
 ### Monitoring & Reporting
-- **Monitoring dashboard** – Real-time, scheduled, and full-search monitoring views
-- **External reports** – Generate and export configurable reports
-- **Log events viewer** – System-level event log for auditing
-- **Actuator administration** – Health and metrics monitoring via Spring Boot Actuator
+
+- **Monitoring dashboard** (`Monitoring`, `MonitoringActual`, `MonitoringScheduled`, `MonitoringFullsearch`) – The monitoring module gives regulators and supervisors three complementary views:
+  - *Actual* – all applications currently active (in-progress) in any workflow stage, with owner and elapsed-time information.
+  - *Scheduled* – upcoming renewal and inspection deadlines, sorted by date.
+  - *Full search* – a cross-workflow, cross-status search with date-range filters, allowing supervisors to find any application by applicant, product name, status, or registration number.
+- **Report configurator** (`ReportConfigurator`) – Administrators define named report templates that combine application data fields, dictionary values, and date ranges. Three scopes are supported: public reports (visible without login), NMRA internal reports, and applicant-facing reports.
+- **External reports** (`ReportsExternal`) – Configured reports are rendered on demand and can be exported to Excel for distribution outside the system.
+- **Application history report** (`ApplicationHistory`) – A detailed, printable history of every action taken on a specific application, suitable for regulatory audits.
+- **Things publisher** (`ThingsPublisher`) – Allows administrators to publish selected application data sets as structured, downloadable reports for external stakeholders.
+- **Log events** (`LogEvents`) – A system-level audit log that records authentication events, configuration changes, and background job execution with timestamps and user attribution.
+- **Actuator administration** (`ActuatorAdm`) – Exposes the Spring Boot Actuator health, metrics, and info endpoints through a protected admin UI so operations staff can check server health without shell access.
+
+---
 
 ### User & Access Management
-- **User registration & authentication** – User self-registration with admin approval; password management
-- **Role-based access control** – Differentiated menus and functions for authorized, guest, and admin users
-- **OAuth2 / security integration** – Secured with Spring Security and OAuth2
-- **Person management** – Manage person records linked to user accounts
-- **Authorities administration** – Manage regulatory authority entities and their staff
+
+- **Self-registration & approval** (`Register`) – New applicants register with their email address and basic profile details. The registration is held in a pending state until a supervisor approves or rejects it, preventing unauthorized access.
+- **Role-based menus** – Three distinct navigation shells are rendered based on the authenticated user's role: `UserNotAuthMenu` (public/guest), `UserAuthMenu` (authenticated applicant), and the administrative shell inside `Administrate` (supervisor/regulator). Each role sees only the functions it is authorized to use.
+- **Admin password management** (`ChangePassAdmin`) – Administrators can reset any user's password from the admin panel without requiring the user to go through a self-service reset flow.
+- **Person management** (`Persons`, `PersonSelector`, `PersonSpecial`) – Structured person records (name, contact details, role) are maintained separately from login accounts, allowing one person to be linked to multiple roles or authorities. A searchable person picker is used across workflows wherever a responsible individual must be named.
+- **Regulatory authority management** (`Authorities`, `Authority`) – The organizational directory of national regulatory authorities and their departments is maintained here. Each authority record stores contact information, linked staff members, and the workflows they are responsible for.
+- **OAuth2 security** – The server (`pharmadex2`) is secured with Spring Security using both OAuth2 Client (for SSO integration) and OAuth2 Resource Server (for API token validation), in addition to form-based login with Spring Session JDBC for stateful browser sessions.
+
+---
 
 ### Import & Legacy Data
-- **Data import (A/B)** – Bulk import of application and product data
-- **ATC code import** – Import WHO ATC classification data
-- **Workflow import** – Import preconfigured workflow definitions
-- **Legacy data migration** – Support for migrating data from previous system versions
+
+- **Application data import — Type A** (`Import_A`) – Bulk import of product applications from a structured Excel template. Designed for initial population of the register when migrating from a spreadsheet-based system.
+- **Application data import — Type B** (`Import_B`) – A second import pathway supporting a different source data layout, enabling integration with heterogeneous legacy systems.
+- **ATC code import** (`Import_ATC`) – Imports the full or partial WHO ATC classification hierarchy from a standard Excel file, updating existing codes in place and adding new ones.
+- **Message import** (`Import_Messages`) – Bulk upload of UI label translations, enabling rapid localization of the interface for a new language without manual entry of each label.
+- **Legacy data viewer** (`LegacyData`) – Displays raw legacy records alongside the migrated OpenRIMS data so that regulators can compare and validate the migration output.
+
+---
 
 ### Localization & Internationalization
-- **Multi-language support** – Configurable UI literals and messages for any language
-- **Jalali (Afghan/Persian) calendar** – Full support for the Afghan solar calendar
-- **Nepali date converter** – Utility for converting Nepali (Bikram Sambat) dates
-- **Locale-aware formats** – Configurable date and number formats per country
+
+- **Multi-language UI** (`Literals`, `Languages`, `Messages`) – All user-visible text strings in the interface are stored as named literals in the database rather than hard-coded. Administrators manage translations per language through the Messages editor. The `Locales` utility resolves the correct string at render time based on the user's selected language.
+- **Jalali (Afghan/Persian) calendar** (`jalali-calendar-master`) – A standalone JavaScript calendar library supports full date entry, display, and arithmetic in the Solar Hijri (Jalali) calendar used in Afghanistan, alongside the Gregorian calendar.
+- **Nepali date converter** (`date-convertor`) – A Java utility library converts between the Bikram Sambat (Nepali) calendar and the Gregorian calendar. Used as a server-side dependency to store and display dates correctly for Nepal deployments.
+- **Locale-aware date & number formats** (`Formats`) – Date formats, decimal separators, and other locale-sensitive display settings are configured per country without code changes.
+- **Calendar date picker** (`CalendarPicker`, `FieldDate`, `ViewEditDate`) – The UI date picker adapts to the active calendar system (Gregorian, Jalali, or Nepali) based on the country configuration.
+
+---
 
 ### Integration & Utilities
-- **Google Maps integration** – Location/address fields with Google Maps support
-- **PDF viewer** – In-browser PDF document viewing
-- **Email notifications** – Integrated mail service for workflow notifications
-- **GraphQL API** – Internal GraphQL endpoint alongside the REST API
-- **Web resources management** – Upload and manage reference documents and resources
-- **Help / content pages** – Configurable in-app help and informational pages
+
+- **Google Maps address integration** (`GoogleMaps`, `AddressForm`, `ProjectMarker`) – Address fields on any form can be enhanced with a Google Maps picker (`@vis.gl/react-google-maps`). Users search by address or drop a pin on the map; coordinates and formatted address are written back to the form automatically. Map markers can be displayed on project/site overview pages.
+- **In-browser PDF viewer** (`ApplicationFiles`, `pdf-viewer-reactjs`) – Uploaded PDF supporting documents are rendered inline in the browser without downloading, keeping the reviewer in the application workflow.
+- **File upload & resource management** (`FieldUpload`, `WebResource`, `Resources`, `ResourceFilling`, `ResourcesUsage`) – Any form variable can be configured as a file attachment field. Uploaded files are stored server-side and linked to the application record. The Resources module manages a global library of reference documents (SOPs, guidance notes, templates) that can be attached to workflow stages.
+- **Email notifications** – Spring Boot Mail integration sends automated email notifications at configurable workflow transition points (e.g. "your application has been assigned for review", "your application requires corrections").
+- **GraphQL API** – A Spring GraphQL endpoint (`spring-boot-starter-graphql`) is available alongside the REST API, enabling structured queries by external data consumers and integration partners.
+- **Data sources for external consumers** (`DataSources`) – SQL-backed data source definitions expose curated data sets (e.g. approved product lists) as queryable endpoints for data warehouses or third-party portals.
+- **Async background jobs** (`AsyncInform`) – Long-running operations (bulk imports, report generation, DWH refresh) run asynchronously in the background with a progress indicator displayed to the user in real time.
+- **Configurable dashboard tiles** (`Tiles`, `Tile`, `TileImage`) – The landing page for each user role is composed of configurable tile widgets, each linking to a specific module or workflow. Tile labels, icons, and target URLs are managed in the admin panel.
+- **In-app help & content pages** (`HelpFrame`, `Content`) – Each form and workflow step can have a context-sensitive help page linked to it. Help content is stored as HTML pages managed in the admin interface.
 
 ---
 
